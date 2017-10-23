@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">BBVAMaps</string>
+    <string name="title_activity_maps">BBVAMap</string>
+    <string name="title_menu_map">View Map</string>
+    <string name="title_menu_list">View List</string>
+</resources>
