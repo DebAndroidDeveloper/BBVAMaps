@@ -42,8 +42,8 @@ public class NearbyPlaceListAdapter extends RecyclerView.Adapter<NearbyPlaceList
         PlaceDetails placeDetails =  mPlaceList.get(position);
         BBVAMapsLog.d(TAG,"Place name : "+placeDetails.getPlaceName() + ":: Rating :"+placeDetails.getRating());
         holder.txtPlaceName.setText(placeDetails.getPlaceName());
-        //displaying rating,instead of distance as the API does ont return distance or vicinity
-        holder.txtPlaceDistance.setText(placeDetails.getRating());
+        holder.txtPlaceDistance.setText(String.valueOf(placeDetails.getVicinity()));
+        holder.itemView.setOnClickListener(createClickListener(placeDetails));
     }
 
     @Override
@@ -60,5 +60,14 @@ public class NearbyPlaceListAdapter extends RecyclerView.Adapter<NearbyPlaceList
             this.txtPlaceName = (TextView) view.findViewById(R.id.place_name_textView);
             this.txtPlaceDistance = (TextView) view.findViewById(R.id.place_distance_textView);
         }
+    }
+
+    private View.OnClickListener createClickListener(@NonNull final PlaceDetails placeDetails) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onRowItemClicked(placeDetails);
+            }
+        };
     }
 }

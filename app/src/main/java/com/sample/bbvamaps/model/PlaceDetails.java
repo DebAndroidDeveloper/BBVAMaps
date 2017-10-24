@@ -2,7 +2,7 @@ package com.sample.bbvamaps.model;
 
 import android.support.annotation.NonNull;
 
-public class PlaceDetails implements Comparable<PlaceDetails>{
+public class PlaceDetails{
     public double getLat() {
         return lat;
     }
@@ -27,18 +27,18 @@ public class PlaceDetails implements Comparable<PlaceDetails>{
         this.placeName = placeName;
     }
 
-    public String getVicinity() {
+    public double getVicinity() {
         return vicinity;
     }
 
-    public void setVicinity(String vicinity) {
+    public void setVicinity(double vicinity) {
         this.vicinity = vicinity;
     }
 
     private double lat;
     private double lon;
     private String placeName;
-    private String vicinity;
+    private double vicinity;
 
     public String getRating() {
         return rating;
@@ -49,10 +49,4 @@ public class PlaceDetails implements Comparable<PlaceDetails>{
     }
 
     private String rating;
-
-    @Override
-    public int compareTo(@NonNull PlaceDetails placeDetails) {
-        //return Integer.parseInt(this.vicinity) - Integer.parseInt(placeDetails.getVicinity());
-        return 0;
-    }
 }

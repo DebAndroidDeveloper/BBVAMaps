@@ -14,6 +14,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.maps.DirectionsApi;
+import com.google.maps.errors.ApiException;
+import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.TravelMode;
 import com.sample.bbvamaps.R;
 import com.sample.bbvamaps.adapter.NearbyPlaceListAdapter;
 import com.sample.bbvamaps.callback.GetNearbyPlaceDataCallBack;
@@ -24,7 +28,12 @@ import com.sample.bbvamaps.network.GetNearByPlacesTask;
 import com.sample.bbvamaps.util.CommonUtils;
 import com.sample.bbvamaps.util.LocationProvider;
 
+import org.joda.time.DateTime;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class NearByPlaceFragment extends BaseFragment implements LocationUpdateCallBack,
@@ -87,7 +96,7 @@ public class NearByPlaceFragment extends BaseFragment implements LocationUpdateC
             public void run() {
                 getNearByPlacesTask.execute(CommonUtils.setUpNearbyPlaceUrl(getActivity(),currentLatitude,currentLongitude));
             }
-        },1000);
+        },1500);
     }
 
     @Override
@@ -109,7 +118,10 @@ public class NearByPlaceFragment extends BaseFragment implements LocationUpdateC
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
         }
-        this.nearbyPlaceList = placeDetailsList;
+        //this.nearbyPlaceList = placeDetailsList;
+        populatePlaceListWithDistance(placeDetailsList);
+        //sort the locations according to distance
+        Collections.sort(this.nearbyPlaceList,new SortNearByPlaceList());
         this.nearbyPlaceListAdapter = new NearbyPlaceListAdapter(getActivity(),this.nearbyPlaceList,this);
         nearbyPlaceListView.setAdapter(this.nearbyPlaceListAdapter);
         this.nearbyPlaceListAdapter.notifyDataSetChanged();
@@ -124,5 +136,44 @@ public class NearByPlaceFragment extends BaseFragment implements LocationUpdateC
     public void onLocationAvailable(Intent intent) {
         currentLatitude = intent.getDoubleExtra("com.sample.bbvamaps.CURRENT_LAT",0.0);
         currentLongitude = intent.getDoubleExtra("com.sample.bbvamaps.CURRENT_LON",0.0);
+    }
+
+    /**
+     *
+     * @param destLat
+     * @param destLong
+     * @return distance between 2 locations in miles
+     */
+    private double getDistanceBetweenLocations(double destLat,double destLong){
+        Location loc1 = new Location("");
+        loc1.setLatitude(currentLatitude);
+        loc1.setLongitude(currentLongitude);
+
+        Location loc2 = new Location("");
+        loc2.setLatitude(destLat);
+        loc2.setLongitude(destLong);
+        float distanceInMeters = loc1.distanceTo(loc2);
+        double distance = distanceInMeters * 0.000621371;
+        return distance;
+    }
+
+    private void populatePlaceListWithDistance(List<PlaceDetails> placeList){
+        if(!this.nearbyPlaceList.isEmpty())
+            this.nearbyPlaceList.clear();
+
+        for(PlaceDetails placeDetails : placeList){
+            double distance = getDistanceBetweenLocations(placeDetails.getLat(),placeDetails.getLon());
+            placeDetails.setVicinity(distance);
+            this.nearbyPlaceList.add(placeDetails);
+        }
+    }
+
+    class SortNearByPlaceList implements Comparator<PlaceDetails>{
+
+        @Override
+        public int compare(PlaceDetails placeDetails1, PlaceDetails placeDetails2) {
+            double diff = placeDetails1.getVicinity() - placeDetails2.getVicinity();
+            return Double.valueOf(diff).intValue();
+        }
     }
 }

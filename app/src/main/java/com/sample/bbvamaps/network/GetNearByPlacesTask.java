@@ -72,7 +72,7 @@ public class GetNearByPlacesTask extends AsyncTask<Object,String ,String > {
             String rating  = googlePlace.get("rating");
             PlaceDetails placeDetails = new PlaceDetails();
             placeDetails.setPlaceName(placeName);
-            placeDetails.setVicinity(vicinity);
+            //placeDetails.setVicinity(vicinity);
             placeDetails.setLat(lat);
             placeDetails.setLon(lng);
             placeDetails.setRating(rating);

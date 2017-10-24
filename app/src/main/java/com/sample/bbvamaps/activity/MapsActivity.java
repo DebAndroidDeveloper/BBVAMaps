@@ -23,6 +23,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -40,7 +41,7 @@ import com.sample.bbvamaps.util.LocationProvider;
 import java.util.List;
 
 public class MapsActivity extends BaseActivity implements OnMapReadyCallback,
-        LocationProvider.LocationCallback,GetNearbyPlaceDataCallBack,GoogleMap.OnMarkerClickListener {
+        LocationProvider.LocationCallback, GetNearbyPlaceDataCallBack, GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
     private LocationProvider mLocationProvider;
@@ -60,13 +61,13 @@ public class MapsActivity extends BaseActivity implements OnMapReadyCallback,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_activity_maps);
-        if(!CheckGooglePlayServices()){
+        if (!CheckGooglePlayServices()) {
             showErrorDialog("Google Play not installed in your device!!");
         }
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setMessage("One moment please...");
         mProgressDialog.setCancelable(false);
-        this.mLocationProvider = new LocationProvider(this,MapsActivity.this, this);
+        this.mLocationProvider = new LocationProvider(this, MapsActivity.this, this);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             checkLocationPermission();
@@ -91,7 +92,7 @@ public class MapsActivity extends BaseActivity implements OnMapReadyCallback,
     @Override
     protected void onResume() {
         super.onResume();
-        if(!CommonUtils.isNetworkAvailable(this)){
+        if (!CommonUtils.isNetworkAvailable(this)) {
             showErrorDialog("Please make sure you have proper internet connection!!");
         }
     }
@@ -107,18 +108,14 @@ public class MapsActivity extends BaseActivity implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-        /*LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
+        setupGoogleMapScreenSettings();
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
                 mMap.setMyLocationEnabled(true);
             }
-        }else{
+        } else {
             mMap.setMyLocationEnabled(true);
         }
         mMap.setOnMarkerClickListener(this);
@@ -130,13 +127,13 @@ public class MapsActivity extends BaseActivity implements OnMapReadyCallback,
         currentLatitude = location.getLatitude();
         currentLongitude = location.getLongitude();
         broadCast("com.sample.bbvamaps.ACTION_LOCATION_UPDATE");
-        BBVAMapsLog.d(getTag(),"Lat :" + currentLatitude +"\n "+"Lon : "+currentLongitude);
+        BBVAMapsLog.d(getTag(), "Lat :" + currentLatitude + "\n " + "Lon : " + currentLongitude);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu_options,menu);
+        menuInflater.inflate(R.menu.menu_options, menu);
         return true;
     }
 
@@ -146,7 +143,7 @@ public class MapsActivity extends BaseActivity implements OnMapReadyCallback,
         switch (item.getItemId()) {
             case R.id.menu_map:
                 final GetNearByPlacesTask getNearByPlacesTask = new GetNearByPlacesTask(this);
-                getNearByPlacesTask.execute(CommonUtils.setUpNearbyPlaceUrl(getApplicationContext(),currentLatitude,currentLongitude));
+                getNearByPlacesTask.execute(CommonUtils.setUpNearbyPlaceUrl(getApplicationContext(), currentLatitude, currentLongitude));
                 this.fragmentManager.
                         beginTransaction().
                         replace(R.id.activity_maps, mapFragment, "mapView").
@@ -198,38 +195,39 @@ public class MapsActivity extends BaseActivity implements OnMapReadyCallback,
         }
     }
 
-    private void checkLocationPermission(){
+    private void checkLocationPermission() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-                //Prompt the user once explanation has been shown
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        PERMISSIONS_REQUEST_LOCATION);
+            //Prompt the user once explanation has been shown
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_LOCATION);
 
 
-            } else {
-                permissionGranted();
-            }
+        } else {
+            permissionGranted();
+        }
 
     }
 
-    private void permissionGranted(){
+    private void permissionGranted() {
         startLocationTracking();
         final GetNearByPlacesTask getNearByPlacesTask = new GetNearByPlacesTask(this);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                getNearByPlacesTask.execute(CommonUtils.setUpNearbyPlaceUrl(getApplicationContext(),currentLatitude,currentLongitude));
+                getNearByPlacesTask.execute(CommonUtils.setUpNearbyPlaceUrl(getApplicationContext(), currentLatitude, currentLongitude));
             }
-        },1000);
+        }, 1500);
         mProgressDialog.show();
     }
+
     private boolean CheckGooglePlayServices() {
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
         int result = googleAPI.isGooglePlayServicesAvailable(this);
-        if(result != ConnectionResult.SUCCESS) {
-            if(googleAPI.isUserResolvableError(result)) {
+        if (result != ConnectionResult.SUCCESS) {
+            if (googleAPI.isUserResolvableError(result)) {
                 googleAPI.getErrorDialog(this, result,
                         0).show();
             }
@@ -238,13 +236,28 @@ public class MapsActivity extends BaseActivity implements OnMapReadyCallback,
         return true;
     }
 
-    private void broadCast(String action){
+    private void broadCast(String action) {
         Intent intent = new Intent();
         intent.setAction(action);
         intent.putExtra("com.sample.bbvamaps.CURRENT_LAT", currentLatitude);
-        intent.putExtra("com.sample.bbvamaps.CURRENT_LON",currentLongitude);
+        intent.putExtra("com.sample.bbvamaps.CURRENT_LON", currentLongitude);
         sendBroadcast(intent);
     }
+
+    private void setupGoogleMapScreenSettings() {
+        mMap.setBuildingsEnabled(true);
+        mMap.setIndoorEnabled(true);
+        mMap.setTrafficEnabled(true);
+        UiSettings mUiSettings = mMap.getUiSettings();
+        mUiSettings.setZoomControlsEnabled(true);
+        mUiSettings.setCompassEnabled(true);
+        mUiSettings.setMyLocationButtonEnabled(true);
+        mUiSettings.setScrollGesturesEnabled(true);
+        mUiSettings.setZoomGesturesEnabled(true);
+        mUiSettings.setTiltGesturesEnabled(true);
+        mUiSettings.setRotateGesturesEnabled(true);
+    }
+
     @Override
     public void onHttpResponseError(Throwable exception) {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
@@ -275,11 +288,11 @@ public class MapsActivity extends BaseActivity implements OnMapReadyCallback,
     @Override
     public boolean onMarkerClick(Marker marker) {
         Bundle bundle = new Bundle();
-        bundle.putString("place_name",marker.getTitle());
-        bundle.putDouble("lat",marker.getPosition().latitude);
-        bundle.putDouble("lon",marker.getPosition().longitude);
+        bundle.putString("place_name", marker.getTitle());
+        bundle.putDouble("lat", marker.getPosition().latitude);
+        bundle.putDouble("lon", marker.getPosition().longitude);
         Intent intent = new Intent(this, PlaceDetailsActivity.class);
-        intent.putExtra("place_details",bundle);
+        intent.putExtra("place_details", bundle);
         startActivity(intent);
         return false;
     }
