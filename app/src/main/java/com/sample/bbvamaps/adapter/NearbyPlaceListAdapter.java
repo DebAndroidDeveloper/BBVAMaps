@@ -42,7 +42,7 @@ public class NearbyPlaceListAdapter extends RecyclerView.Adapter<NearbyPlaceList
         PlaceDetails placeDetails =  mPlaceList.get(position);
         BBVAMapsLog.d(TAG,"Place name : "+placeDetails.getPlaceName() + ":: Rating :"+placeDetails.getRating());
         holder.txtPlaceName.setText(placeDetails.getPlaceName());
-        holder.txtPlaceDistance.setText(String.valueOf(placeDetails.getVicinity()));
+        holder.txtPlaceDistance.setText(String.valueOf(placeDetails.getVicinity() +" miles"));
         holder.itemView.setOnClickListener(createClickListener(placeDetails));
     }
 

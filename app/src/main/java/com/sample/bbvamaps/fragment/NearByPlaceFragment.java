@@ -19,12 +19,14 @@ import com.google.maps.errors.ApiException;
 import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.TravelMode;
 import com.sample.bbvamaps.R;
+import com.sample.bbvamaps.activity.DirectionActivity;
 import com.sample.bbvamaps.adapter.NearbyPlaceListAdapter;
 import com.sample.bbvamaps.callback.GetNearbyPlaceDataCallBack;
 import com.sample.bbvamaps.callback.LocationUpdateCallBack;
 import com.sample.bbvamaps.callback.LocationUpdateReceiver;
 import com.sample.bbvamaps.model.PlaceDetails;
 import com.sample.bbvamaps.network.GetNearByPlacesTask;
+import com.sample.bbvamaps.util.BBVAMapsLog;
 import com.sample.bbvamaps.util.CommonUtils;
 import com.sample.bbvamaps.util.LocationProvider;
 
@@ -96,7 +98,7 @@ public class NearByPlaceFragment extends BaseFragment implements LocationUpdateC
             public void run() {
                 getNearByPlacesTask.execute(CommonUtils.setUpNearbyPlaceUrl(getActivity(),currentLatitude,currentLongitude));
             }
-        },1500);
+        },2000);
     }
 
     @Override
@@ -129,13 +131,19 @@ public class NearByPlaceFragment extends BaseFragment implements LocationUpdateC
 
     @Override
     public void onRowItemClicked(@NonNull PlaceDetails placeDetails) {
-        //TODO:Show details and directions
+        //TODO:Show driving directions
+        Intent intent = new Intent(this.getActivity(), DirectionActivity.class);
+        intent.putExtra("current_lat",currentLatitude);
+        intent.putExtra("current_lon",currentLongitude);
+        intent.putExtra("dest_address",placeDetails.getPlaceName());
+        startActivity(intent);
     }
 
     @Override
     public void onLocationAvailable(Intent intent) {
         currentLatitude = intent.getDoubleExtra("com.sample.bbvamaps.CURRENT_LAT",0.0);
         currentLongitude = intent.getDoubleExtra("com.sample.bbvamaps.CURRENT_LON",0.0);
+        BBVAMapsLog.d(getTag(), "Lat :" + currentLatitude + "\n " + "Lon : " + currentLongitude);
     }
 
     /**

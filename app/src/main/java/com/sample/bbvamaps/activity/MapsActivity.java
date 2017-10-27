@@ -47,7 +47,7 @@ public class MapsActivity extends BaseActivity implements OnMapReadyCallback,
     private LocationProvider mLocationProvider;
     private double currentLatitude;
     private double currentLongitude;
-    MapFragment mapFragment;
+    private MapFragment mapFragment;
     FragmentManager fragmentManager;
     private ProgressDialog mProgressDialog;
     public static final int PERMISSIONS_REQUEST_LOCATION = 100;
@@ -102,7 +102,7 @@ public class MapsActivity extends BaseActivity implements OnMapReadyCallback,
      * This callback is triggered when the map is ready to be used.
      * This is where we can add markers or lines, add listeners or move the camera.
      * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
+     * it inside the MapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
     @Override
@@ -127,7 +127,6 @@ public class MapsActivity extends BaseActivity implements OnMapReadyCallback,
         currentLatitude = location.getLatitude();
         currentLongitude = location.getLongitude();
         broadCast("com.sample.bbvamaps.ACTION_LOCATION_UPDATE");
-        BBVAMapsLog.d(getTag(), "Lat :" + currentLatitude + "\n " + "Lon : " + currentLongitude);
     }
 
     @Override
