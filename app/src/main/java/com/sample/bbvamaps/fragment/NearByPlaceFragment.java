@@ -68,7 +68,8 @@ public class NearByPlaceFragment extends BaseFragment implements LocationUpdateC
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
         this.nearbyPlaceList = new ArrayList<>();
-        //this.nearbyPlaceListAdapter = new NearbyPlaceListAdapter(getActivity(),this.nearbyPlaceList,this);
+        this.nearbyPlaceListAdapter = new NearbyPlaceListAdapter(getActivity(),this);
+        nearbyPlaceListView.setAdapter(this.nearbyPlaceListAdapter);
         this.locationUpdateReceiver = new LocationUpdateReceiver(this);
         mFilter = new IntentFilter();
         mFilter.addAction("com.sample.bbvamaps.ACTION_LOCATION_UPDATE");
@@ -124,8 +125,7 @@ public class NearByPlaceFragment extends BaseFragment implements LocationUpdateC
         populatePlaceListWithDistance(placeDetailsList);
         //sort the locations according to distance
         Collections.sort(this.nearbyPlaceList,new SortNearByPlaceList());
-        this.nearbyPlaceListAdapter = new NearbyPlaceListAdapter(getActivity(),this.nearbyPlaceList,this);
-        nearbyPlaceListView.setAdapter(this.nearbyPlaceListAdapter);
+        this.nearbyPlaceListAdapter.setmPlaceList(this.nearbyPlaceList);
         this.nearbyPlaceListAdapter.notifyDataSetChanged();
     }
 

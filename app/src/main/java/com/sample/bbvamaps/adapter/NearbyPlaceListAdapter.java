@@ -12,12 +12,22 @@ import com.sample.bbvamaps.R;
 import com.sample.bbvamaps.model.PlaceDetails;
 import com.sample.bbvamaps.util.BBVAMapsLog;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NearbyPlaceListAdapter extends RecyclerView.Adapter<NearbyPlaceListAdapter.ViewHolder>{
     private static final String TAG = NearbyPlaceListAdapter.class.getCanonicalName();
 
     private Context mContext;
+
+    public List<PlaceDetails> getmPlaceList() {
+        return mPlaceList;
+    }
+
+    public void setmPlaceList(List<PlaceDetails> mPlaceList) {
+        this.mPlaceList = mPlaceList;
+    }
+
     private List<PlaceDetails> mPlaceList;
     private Listener mListener;
 
@@ -25,10 +35,9 @@ public class NearbyPlaceListAdapter extends RecyclerView.Adapter<NearbyPlaceList
         void onRowItemClicked(@NonNull PlaceDetails placeDetails);
     }
 
-    public NearbyPlaceListAdapter(@NonNull Context context, @NonNull List<PlaceDetails> placeDetailsList,
-                                  @NonNull Listener listener){
+    public NearbyPlaceListAdapter(@NonNull Context context,@NonNull Listener listener){
         this.mContext = context;
-        this.mPlaceList = placeDetailsList;
+        this.mPlaceList = new ArrayList<>();
         this.mListener = listener;
     }
     @Override
