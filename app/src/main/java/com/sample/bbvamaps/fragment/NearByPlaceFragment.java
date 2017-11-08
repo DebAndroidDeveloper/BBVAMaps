@@ -69,7 +69,6 @@ public class NearByPlaceFragment extends BaseFragment implements LocationUpdateC
         mProgressDialog.show();
         this.nearbyPlaceList = new ArrayList<>();
         this.nearbyPlaceListAdapter = new NearbyPlaceListAdapter(getActivity(),this);
-        nearbyPlaceListView.setAdapter(this.nearbyPlaceListAdapter);
         this.locationUpdateReceiver = new LocationUpdateReceiver(this);
         mFilter = new IntentFilter();
         mFilter.addAction("com.sample.bbvamaps.ACTION_LOCATION_UPDATE");
@@ -85,7 +84,7 @@ public class NearByPlaceFragment extends BaseFragment implements LocationUpdateC
         nearbyPlaceListView = (RecyclerView)nearbyListView.findViewById(R.id.nearby_place_listView) ;
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         nearbyPlaceListView.setLayoutManager(layoutManager);
-        //nearbyPlaceListView.setAdapter(this.nearbyPlaceListAdapter);
+        nearbyPlaceListView.setAdapter(this.nearbyPlaceListAdapter);
         return nearbyListView;
     }
 
